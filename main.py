@@ -1,23 +1,22 @@
-# main.py
 from datetime import timedelta
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas import UserCreate
-from database import engine, get_db, init_db, UserDB
+from database import engine, get_db, UserDB, Base
 from models import User, Token
 from auth import create_access_token, authenticate_user, get_current_active_user, get_password_hash
 
 app = FastAPI()
 
-@app.on_event("startup")
-async def startup():
-    await init_db()
+auth_router = APIRouter(
+    tags=["Authentication"],  # Группировка в документации Swagger
+)
 
-@app.post("/token", response_model=Token)
+@auth_router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     user = await authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -32,11 +31,11 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/users/me/", response_model=User)
+@auth_router.get("/users/me/", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
 
-@app.post("/register/")
+@auth_router.post("/register/")
 async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     existing_user = await db.execute(select(UserDB).where((UserDB.username == user.username) | (UserDB.email == user.email)))
     if existing_user.scalars().first():
@@ -48,3 +47,16 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     await db.refresh(new_user)
     return {"message": "User registered successfully"}
 
+app.include_router(auth_router)
+@app.on_event("startup")
+async def startup():
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        print("Database connection established")
+    except Exception as e:
+        print(f"Database connection failed: {e}")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
