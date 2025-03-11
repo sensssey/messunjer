@@ -1,4 +1,3 @@
-# auth.py
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -9,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.future import select
 
-from models import User, UserInDB, TokenData
+from src.models.models import User, TokenData
 from database import UserDB, get_db
 from config import SECRET_KEY, ALGORITHM
 

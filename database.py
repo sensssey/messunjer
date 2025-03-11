@@ -1,4 +1,3 @@
-# database.py
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -19,9 +18,6 @@ class UserDB(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-
-
-
 
 async def get_db():
     async with SessionLocal() as session:
