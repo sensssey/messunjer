@@ -9,8 +9,8 @@ from fastapi import Depends, HTTPException, status
 from sqlalchemy.future import select
 
 from src.models.models import User, TokenData
-from database import UserDB, get_db
-from config import SECRET_KEY, ALGORITHM
+from src.database import UserDB, get_db
+from src.config import SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

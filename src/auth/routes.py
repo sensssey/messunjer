@@ -4,9 +4,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models.models import User, Token
-from src.api.auth import create_access_token,  get_current_active_user, get_password_hash
-from src.api.auth import authenticate_user
-from database import get_db, UserDB
+from src.auth.auth import create_access_token,  get_current_active_user, get_password_hash
+from src.auth.auth import authenticate_user
+from src.database import get_db, UserDB
 from fastapi.security import OAuth2PasswordRequestForm
 from src.schemas.schemas import UserCreate
 
