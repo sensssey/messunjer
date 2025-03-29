@@ -8,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.future import select
 
-from src.models.models import User, TokenData
-from src.database import UserDB, get_db
+from src.schemas.schemas import User, TokenData
+from src.models.models import UserDB
+from src.database import get_db
 from src.config import SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
