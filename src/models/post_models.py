@@ -13,9 +13,8 @@ class Post(Base):
     created_at = Column(DateTime, default=datetime)
     updated_at = Column(DateTime, default=datetime, onupdate=datetime)
 
-    parameters = relationship("PostParameter", back_populates="post")
 
-class Parameter(Base):
+'''class Parameter(Base):
     __tablename__ = "parameters"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
@@ -30,4 +29,4 @@ class PostParameter(Base):
     value = Column(Float)
 
     post = relationship("Post", back_populates="parameters")
-    parameter = relationship("Parameter")
+    parameter = relationship("Parameter")'''

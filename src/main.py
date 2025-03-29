@@ -2,12 +2,12 @@ from fastapi import FastAPI
 
 from src.database import engine, Base
 from src.auth.routes import auth_router
-from src.posts.routes import post_router
+from src.posts.routes import posts_router
 
 app = FastAPI()
 
 app.include_router(auth_router)
-app.include_router(post_router)
+app.include_router(posts_router)
 @app.on_event("startup")
 async def startup():
     try:

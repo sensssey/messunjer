@@ -1,30 +1,59 @@
+# posts/crud.py
+from datetime import datetime
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.models.post_models import Post, Parameter, PostParameter
-from src.schemas.post_schemas import PostCreate, ParameterCreate
+from sqlalchemy.orm import joinedload
 
-async def create_post(db: AsyncSession, user_id: int, post_data: PostCreate):
-    new_post = Post(user_id=user_id, title=post_data.title, content=post_data.content)
+from src.models.post_models import Post
+from src.schemas.post_schemas import PostUpdate, PostCreate
+
+
+async def create_post(db: AsyncSession, post_data: PostCreate, user_id: int):
+    new_post = Post(
+        user_id=user_id,
+        title=post_data.title,
+        content=post_data.content,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
+    )
     db.add(new_post)
     await db.commit()
     await db.refresh(new_post)
-
-    for param in post_data.parameters:
-        parameter_id = param["parameter_id"]
-        value = param["value"]
-        post_parameter = PostParameter(post_id=new_post.id, parameter_id=parameter_id, value=value)
-        db.add(post_parameter)
-    await db.commit()
-
     return new_post
+
+async def get_post_by_id(db: AsyncSession, post_id: int):
+    result = await db.execute(select(Post).where(Post.id == post_id))
+    return result.scalars().first()
 
 async def get_posts_by_user(db: AsyncSession, user_id: int):
     result = await db.execute(select(Post).where(Post.user_id == user_id))
     return result.scalars().all()
 
-async def create_parameter(db: AsyncSession, user_id: int, parameter_data: ParameterCreate):
-    new_parameter = Parameter(user_id=user_id, **parameter_data.dict())
-    db.add(new_parameter)
+async def update_post(db: AsyncSession, post_id: int, post_data: PostUpdate):
+    result = await db.execute(select(Post).where(Post.id == post_id))
+    post = result.scalars().first()
+
+    if not post:  # Если пост не найден
+        return None
+
+    # Обновляем поля
+    if post_data.title is not None:
+        post.title = post_data.title
+    if post_data.content is not None:
+        post.content = post_data.content
+
+    post.updated_at = datetime.utcnow()
     await db.commit()
-    await db.refresh(new_parameter)
-    return new_parameter
+    await db.refresh(post)
+    return post
+
+async def delete_post(db: AsyncSession, post_id: int):
+    result = await db.execute(select(Post).where(Post.id == post_id))
+    post = result.scalars().first()
+
+    if not post:  # Если пост не найден
+        return None
+
+    await db.delete(post)
+    await db.commit()
+    return post
