@@ -1,8 +1,6 @@
-# posts/crud.py
 from datetime import datetime
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from src.models.post_models import Post
 from src.schemas.post_schemas import PostUpdate, PostCreate
@@ -21,6 +19,7 @@ async def create_post(db: AsyncSession, post_data: PostCreate, user_id: int):
     await db.refresh(new_post)
     return new_post
 
+
 async def get_post_by_id(db: AsyncSession, post_id: int):
     result = await db.execute(select(Post).where(Post.id == post_id))
     return result.scalars().first()
@@ -33,7 +32,7 @@ async def update_post(db: AsyncSession, post_id: int, post_data: PostUpdate):
     result = await db.execute(select(Post).where(Post.id == post_id))
     post = result.scalars().first()
 
-    if not post:  # Если пост не найден
+    if not post:
         return None
 
     # Обновляем поля
@@ -51,7 +50,7 @@ async def delete_post(db: AsyncSession, post_id: int):
     result = await db.execute(select(Post).where(Post.id == post_id))
     post = result.scalars().first()
 
-    if not post:  # Если пост не найден
+    if not post: 
         return None
 
     await db.delete(post)

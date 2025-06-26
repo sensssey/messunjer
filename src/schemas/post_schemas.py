@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import List, Dict, Optional
+from typing import Optional
 
 class PostBase(BaseModel):
     title: Optional[str] = None
@@ -12,7 +12,7 @@ class PostCreate(PostBase):
     pass
 
 class PostUpdate(PostBase):
-    pass  # Все поля необязательные благодаря PostBase
+    pass
 
 class Post(PostBase):
     id: int

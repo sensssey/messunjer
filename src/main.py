@@ -1,13 +1,17 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from src.database import engine, Base
 from src.auth.routes import auth_router
 from src.posts.routes import posts_router
-
+from src.profile.logikaprofilya import pr_router
+from src.config import BASE_DIR
 app = FastAPI()
 
 app.include_router(auth_router)
 app.include_router(posts_router)
+app.include_router(pr_router)
+
 @app.on_event("startup")
 async def startup():
     try:
@@ -17,6 +21,12 @@ async def startup():
     except Exception as e:
         print(f"Database connection failed: {e}")
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+print(BASE_DIR)
