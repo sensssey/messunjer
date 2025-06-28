@@ -42,10 +42,16 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
     existing_user = await db.execute(
         select(UserDB).where(UserDB.username == user.username))
     if existing_user.scalars().first():
-        raise HTTPException(status_code=400, detail="Username or email already registered")
+        raise HTTPException(status_code=400, detail="Username already registered")
     hashed_password = get_password_hash(user.password)
     new_user = UserDB(username=user.username, hashed_password=hashed_password)
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
-    return {"message": "User registered successfully"}
+    access_token = create_access_token(data={"sub": new_user.username})
+
+    return {
+        "message": "User registered successfully",
+        "access_token": access_token,  # Добавляем токен в ответ
+        "token_type": "bearer"
+    }
