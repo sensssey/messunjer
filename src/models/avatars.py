@@ -9,5 +9,4 @@ class AvatarDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)
     file_data = Column(Text)
-
     user = relationship("UserDB", back_populates="avatar")
