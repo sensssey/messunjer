@@ -52,6 +52,6 @@ async def register(user: UserCreate, db: AsyncSession = Depends(get_db)):
 
     return {
         "message": "User registered successfully",
-        "access_token": access_token,  # Добавляем токен в ответ
+        "access_token": access_token, 
         "token_type": "bearer"
     }

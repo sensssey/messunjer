@@ -5,7 +5,7 @@ from src.database import engine, Base
 from src.auth.routes import auth_router
 from src.posts.routes import posts_router
 from src.profile.logikaprofilya import pr_router
-from src.config import BASE_DIR
+
 app = FastAPI()
 
 app.include_router(auth_router)
@@ -29,4 +29,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print(BASE_DIR)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0")
